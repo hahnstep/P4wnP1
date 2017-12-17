@@ -14,3 +14,6 @@
 [submodule "hostapd-mana"]
 	path = hostapd-mana
 	url = https://github.com/mame82/P4wnP1_hostapd-mana_additions
+[submodule "p4wnp1HATs"]
+	path = p4wnp1HATs
+	url = https://github.com/hahnstep/p4wnp1HATs
