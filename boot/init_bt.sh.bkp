@@ -161,12 +161,12 @@ function start_BLUETOOTH_PAN_CLIENT()
 	sudo bt-adapter -a hci0 --set Pairable 1
 	sudo bt-adapter -a hci0 --set PairableTimeout 0
 
-	echo "Starting to search for an available Bluetooth Netwok Access Point (NAP)"
+#	echo "Starting to search for an available Bluetooth Netwok Access Point (NAP)"
 
 	# run through the list of known devices, till a device is found which is connected
 	PAN_UP=false
 	while ! $PAN_UP; do
-		echo "Inspecting seen BT devices"
+#		echo "Inspecting seen BT devices"
 
 		# grab MACs of seen devices
 		macs=$(bt-device -l | grep -o -e '..:..:..:..:..:..')
@@ -174,41 +174,41 @@ function start_BLUETOOTH_PAN_CLIENT()
 
 		# for each device, check if it is connected
 		for mac in $macs; do 
-			echo "... Found bluetooth device $mac ... check if it is connected"
-			if (bt-device -i $mac | grep -q -e "Connected: 1"); then 
-				echo "... $mac is connected, checking if the device provides NAP"
+#			echo "... Found bluetooth device $mac ... check if it is connected"
+            if (bt-device -i $mac | grep -q -e "Connected: 1"); then 
+#				echo "... $mac is connected, checking if the device provides NAP"
 
 				if (bt-device -i $mac | grep -q -e "NAP"); then 
-					echo "... $mac provides us a NAP, trying to connect to the network" 
+#					echo "... $mac provides us a NAP, trying to connect to the network" 
 					sudo bt-network -a hci0 --connect $mac nap &
 
 					# wait for bnep interface to come up
 					BNEP_UP=false
-					echo "waiting for bnep0 interface to come up..."
+#					echo "waiting for bnep0 interface to come up..."
 					while ! $BNEP_UP; do
 						if (ifconfig | grep -q -e "bnep0"); then
-							echo ""
-							echo "bnep0 interface up, starting dhcpclient"
+#							echo ""
+#							echo "bnep0 interface up, starting dhcpclient"
 							sudo dhclient bnep0
 							BNEP_UP=true
-						else
-							printf "."
+#						else
+#							printf "."
 						fi
 					done
 
 					PAN_UP=true
-					echo "ToDo: check for connection success, before break and start DHCP"
+#					echo "ToDo: check for connection success, before break and start DHCP"
 					break
-				else
-					echo "... $mac doesn't provide a NAP (no bluetooth tethering)"
+#				else
+#					echo "... $mac doesn't provide a NAP (no bluetooth tethering)"
 				fi
-			else
-				echo "... $mac is not connected"
+#			else
+#				echo "... $mac is not connected"
 			fi
         done
 
         # take a 1 second break before evaluating the device list again
-        echo "... no device connected, sleeping a while"
+#        echo "... no device connected, sleeping a while"
         sleep 1
 	done
 
@@ -259,7 +259,7 @@ function discover_BT_DEVICES_till_found()
 if $BLUETOOTH_PAN_AUTO; then
 	# try to establish a connection to an existing BNEP providing a NAP
 	# the NAP providing device has to initiate pairing AND CONNECTION
-	(start_BLUETOOTH_PAN_CLIENT > /dev/null) & # supress script output, to avoid log flooding (only needed for debug)
+	start_BLUETOOTH_PAN_CLIENT &
 else
 	# Bring up an own BNEP NAP and allow everyone to pair
 	if $BLUETOOTH_NAP; then
